@@ -1,0 +1,17 @@
+params:
+  - id: db_pw
+    type: secret
+    name: "数据库密码"
+    description: "PostgreSQL 数据库密码（已预置随机值，应用自动使用，无需手动填写）"
+    default_value: "EOjWHx2hKmpOEejBYL87"
+    optional: false
+
+locales:
+  zh:
+    db_pw:
+      name: "数据库密码"
+      description: "PostgreSQL 数据库密码（已预置随机值，应用自动使用，无需手动填写）"
+  en:
+    db_pw:
+      name: "Database password"
+      description: "PostgreSQL password (pre-filled with a random value, used automatically)"

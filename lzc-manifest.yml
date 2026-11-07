@@ -1,0 +1,68 @@
+application:
+  subdomain: mattermost
+  multi_instance: false
+  # 自带完整账号体系（首个注册账号即为系统管理员，网页自助建号），
+  # 按 papra/servas 判例加 public_path，由应用自身登录页鉴权。
+  public_path:
+    - /
+  upstreams:
+    - location: /package-licenses/
+      backend: file:///lzcapp/pkg/content/licenses/
+    - location: /
+      backend: http://mattermost:8065/
+
+services:
+  mattermost:
+    # upstream: docker.io/mattermost/mattermost-team-edition:12.1.0
+    image: docker.1ms.run/mattermost/mattermost-team-edition:12.1.0
+    environment:
+      - TZ=Asia/Shanghai
+      - MM_SERVICESETTINGS_SITEURL=https://{{.S.AppDomain}}
+      - MM_SQLSETTINGS_DRIVERNAME=postgres
+      - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:{{PASSWORD_db_pw}}@mattermost-db:5432/mattermost?sslmode=disable&connect_timeout=10
+      - MM_FILESETTINGS_DIRECTORY=/mattermost/data/
+      - MM_PLUGINSETTINGS_CLIENTDIRECTORY=/mattermost/plugins/
+    binds:
+      - /lzcapp/var/data:/mattermost/data
+      - /lzcapp/var/config:/mattermost/config
+      - /lzcapp/var/logs:/mattermost/logs
+      - /lzcapp/var/plugins:/mattermost/plugins
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8065/api/v4/system/ping || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      - mattermost-db
+  mattermost-db:
+    # upstream: library/postgres:17.2
+    image: docker.1ms.run/library/postgres:17.2
+    environment:
+      - POSTGRES_USER=mmuser
+      - POSTGRES_PASSWORD={{PASSWORD_db_pw}}
+      - POSTGRES_DB=mattermost
+      - TZ=Asia/Shanghai
+    binds:
+      - /lzcapp/var/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d mattermost -U mmuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+usage: |
+  Mattermost 是一个开源的团队协作平台（Slack 的自托管替代），
+  提供频道、私信、文件共享、音视频通话与丰富的集成能力，
+  本包为官方 Team Edition。
+
+  使用方法：
+  1. 打开应用，首次访问按页面引导创建第一个账号，该账号即系统管理员。
+  2. 数据库密码已在部署参数中预置随机值，无需手动填写。
+  3. 数据（含上传文件）存放在 /lzcapp/var/data，数据库存放在 /lzcapp/var/db。
+  4. Team Edition 用户数上限 50 人；更多功能（如 SSO/高级合规）需企业版许可。
+
+  说明：
+  - 本包未做实机验证，功能以官方文档为准：https://docs.mattermost.com/
+  - 官方编译版按 MIT 许可分发（详见镜像内 MIT-COMPILED-LICENSE.md 与
+    /package-licenses/ 中的官方 Licensing 说明），源码为 AGPL-3.0。

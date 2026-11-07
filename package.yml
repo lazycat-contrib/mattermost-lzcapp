@@ -1,0 +1,18 @@
+package: community.lazycat.app.mattermost
+name: Mattermost
+version: 12.1.0
+description: "Open-source team collaboration platform: channels, direct messages, file sharing, calls and integrations (Team Edition)."
+min_os_version: "1.5.0"
+homepage: https://mattermost.com
+author: mattermost
+license: MIT
+permissions:
+  required:
+    - net.internet
+locales:
+  zh:
+    name: Mattermost
+    description: "开源团队协作平台：频道、私信、文件共享、通话与集成（Team Edition）。"
+  en:
+    name: Mattermost
+    description: "Open-source team collaboration platform: channels, direct messages, file sharing, calls and integrations (Team Edition)."
