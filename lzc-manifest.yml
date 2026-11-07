@@ -10,10 +10,9 @@ application:
       backend: file:///lzcapp/pkg/content/licenses/
     - location: /
       backend: http://mattermost:8065/
-
 services:
   mattermost:
-    # upstream: docker.io/mattermost/mattermost-team-edition:12.1.0
+    # upstream: mattermost/mattermost-team-edition:12.1.0
     image: docker.1ms.run/mattermost/mattermost-team-edition:12.1.0
     environment:
       - TZ=Asia/Shanghai
@@ -36,8 +35,8 @@ services:
     depends_on:
       - mattermost-db
   mattermost-db:
-    # upstream: library/postgres:17.2
-    image: docker.1ms.run/library/postgres:17.2
+    # upstream: library/postgres:17.11
+    image: docker.1ms.run/library/postgres:17.11
     environment:
       - POSTGRES_USER=mmuser
       - POSTGRES_PASSWORD={{PASSWORD_db_pw}}
@@ -50,7 +49,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
 usage: |
   Mattermost 是一个开源的团队协作平台（Slack 的自托管替代），
   提供频道、私信、文件共享、音视频通话与丰富的集成能力，
